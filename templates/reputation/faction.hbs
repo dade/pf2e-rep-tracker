@@ -1,0 +1,54 @@
+<section class="content reptuation faction {{tab.cssClass}}" data-group="reputation" data-tab="faction">
+	<header class="content-header">
+		<h3>Factions</h3>
+	</header>
+	{{#if party.factions}}
+	{{#each party.factions as |faction|}}
+	<section class="rep-entry">
+		<section class="party-rep faction" data-id="{{faction.id}}">
+			<div class="rep-expand">
+				<a class="expand">
+					<i class="fa-solid fa-caret-{{#if faction.expanded}}down{{else}}right{{/if}}"></i>
+				</a>
+			</div>
+			<div class="rep-details">
+				<div class="form-group">
+					<input data-field-id="faction-{{faction.id}}-party-name" class="group-name" name="rep-name" type="text" value="{{faction.name}}" />
+				</div>
+				<span class="party-value">
+					<strong>Party Reputation:</strong>&nbsp;
+					<input data-field-id="faction-{{faction.id}}-party-rep" class="number-input" type="number" value="{{faction.value}}" />&nbsp;
+					<p><small><em>{{getRepText faction.value false}}</em></small></p>
+				</span>
+			</div>
+			<div class="rep-controls">
+				<a class="edit"><i class="fas fa-cog"></i></a>
+				<a class="delete"><i class="fas fa-trash"></i></a>
+			</div>
+		</section>
+		{{#if faction.showpcs}}
+		<section class="member-rep expanded-{{faction.expanded}}">
+			{{#each faction.pcs as |pc|}}
+			<div class="member-row" data-id="{{pc.uuid}}">
+				<img src="{{getImgFromUUID pc.uuid}}" />
+				<p class="member-name">
+					{{pc.name}}
+					<span><small><em>{{getRepText pc.value false}}</em></small></span>
+				</p>
+				<input data-field-id="faction-{{faction.id}}-{{pc.uuid}}-rep" name="rep-val" type="number" class="number-input" value="{{pc.value}}" />
+			</div>
+			{{/each}}
+		</section>
+		{{else}}
+		<section class="member-rep expanded-{{faction.expanded}}">
+			<p>Individual PC rep as been disabled for this reputation. You can edit its settings by clicking the <i class="fas fa-cog"></i> on the right</p>
+		</section>
+		{{/if}}
+	</section>
+	{{/each}}
+	{{else}}
+	<div class="no-data">
+		<p>No data to show. Add a new faction from the header menu.</p>
+	</div>
+	{{/if}}
+</section>

@@ -1,0 +1,57 @@
+<section class="content reptuation npc {{tab.cssClass}}" data-group="reputation" data-tab="npc">
+	<header class="content-header">
+		<h3>NPCs</h3>
+	</header>
+	{{#if party.npcs}}
+	{{#each party.npcs as |npc|}}
+	<section class="rep-entry">
+		<section class="party-rep npc" data-id="{{npc.id}}">
+			<div class="rep-expand">
+				<a class="expand">
+					<i class="fa-solid fa-caret-{{#if npc.expanded}}down{{else}}right{{/if}}"></i>
+				</a>
+			</div>
+			<div class="rep-details">
+				<div class="form-group">
+					<input data-field-id="npc-{{npc.id}}-party-name" class="group-name" name="rep-name" type="text" value="{{npc.name}}" />
+				</div>
+				{{#if npc.useInfluence}}
+				{{else}}
+				<span class="party-value">
+					<strong>Party Reputation:</strong>&nbsp;
+					<input data-field-id="npc-{{npc.id}}-party-rep" class="number-input" type="number" value="{{npc.value}}" />&nbsp;
+					<p><small><em>{{getRepText npc.value false}}</em></small></p>
+				</span>
+				{{/if}}
+			</div>
+			<div class="rep-controls">
+				<a class="edit"><i class="fas fa-cog"></i></a>
+				<a class="delete"><i class="fas fa-trash"></i></a>
+			</div>
+		</section>
+		{{#if npc.showpcs}}
+		<section class="member-rep expanded-{{npc.expanded}}">
+			{{#each npc.pcs as |pc|}}
+			<div class="member-row" data-id="{{pc.uuid}}">
+				<img src="{{getImgFromUUID pc.uuid}}" />
+				<p class="member-name">
+					{{pc.name}}
+					<span><small><em>{{getRepText pc.value npc.useInfluence}}</em></small></span>
+				</p>
+				<input data-field-id="npc-{{npc.id}}-{{pc.uuid}}-rep" name="rep-val" type="number" class="number-input" value="{{pc.value}}" />
+			</div>
+			{{/each}}
+		</section>
+		{{else}}
+		<section class="member-rep expanded-{{npc.expanded}}">
+			<p>Individual PC rep as been disabled for this reputation. You can edit its settings by clicking the <i class="fas fa-cog"></i> on the right</p>
+		</section>
+		{{/if}}
+	</section>
+	{{/each}}
+	{{else}}
+	<div class="no-data">
+		<p>No data to show. Add a new NPC from the header menu.</p>
+	</div>
+	{{/if}}
+</section>

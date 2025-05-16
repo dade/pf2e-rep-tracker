@@ -1,0 +1,170 @@
+@layer reputation {
+  .rep-tracker section.window-content {
+    margin: 0;
+  }
+  .rep-tracker section.window-content .content {
+    display: none;
+  }
+  .rep-tracker section.window-content .content.active {
+    display: block;
+  }
+  .rep-tracker section.window-content .content.active .content-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .rep-tracker section.window-content .content.active .content-header h3 {
+    margin: 0.5rem;
+    font-size: 1.5rem;
+  }
+  .rep-tracker section.window-content .content.active a {
+    margin: 0.2rem;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry {
+    color: darkgrey;
+    background-color: rgba(40, 40, 40, 0.5);
+    border-radius: 4px 0 4px 0;
+    margin: 0.5em;
+    transition: all 0.5s ease;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry input.number-input {
+    border: none;
+    width: 40px;
+    height: 22px;
+    text-align: center;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep h3 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-expand {
+    margin: 10px;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-controls {
+    margin: 10px;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details {
+    width: 90%;
+    margin: 0.3rem 0;
+    align-self: flex-start;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details .form-group {
+    display: block;
+    margin: 0;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details .form-group label {
+    flex: 0.6;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details .form-group input.group-name {
+    border: none;
+    font-size: 1.25em;
+    height: 1.7em;
+    font-weight: 700;
+    padding: 0.3rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid orangered;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details .form-group input.group-name:focus {
+    box-shadow: none;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details .rep-expand {
+    font-size: 22px;
+    margin: auto 0 auto 1rem;
+    padding: 0;
+    text-align: center;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details .party-value {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details h3,
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details p,
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details span {
+    margin: 0;
+    padding: 5px;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-details input.rep-input {
+    border: none;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .rep-controls {
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .party-rep .no-data {
+    margin: 1rem;
+    padding: 0;
+    font-style: italic;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .member-rep {
+    margin: 0 0.5rem;
+    padding: 0.3rem 0.6rem;
+    border-top: 1px solid grey;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .member-rep.expanded-true {
+    display: block;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .member-rep.expanded-false {
+    display: none;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .member-rep .member-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    height: 22px;
+    margin: 2px auto;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .member-rep .member-row:first-child {
+    margin-top: 6px;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .member-rep .member-row img {
+    border: none;
+    width: 22px;
+    height: 22px;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .member-rep .member-row p.member-name {
+    flex: 1;
+    border-bottom: 1px solid lightsalmon;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .rep-tracker section.window-content .content.active .rep-entry .member-rep .form-group {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+  }
+  .rep-tracker section.window-content .window-resizable-handle {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    bottom: -1px;
+    right: 0;
+    background: #444;
+    padding: 2px;
+    border: 1px solid var(--color-border-dark-1);
+    border-radius: 4px 0 0 0;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
