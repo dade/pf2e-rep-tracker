@@ -16,9 +16,10 @@ Hooks.once("ready", () => {
 	if (!repFlags) {
 		ReputationSystem.buildData(game.actors.party, REPUTATION_SCHEMA)
 	}
+});
 
+Hooks.on("ready", () => {
 	const rep = new PF2eReputation()
-	//rep.render(true)
 
 	$(".actors-sidebar .directory-header .header-actions").after(
 		`<div class="header-actions action-buttons flexrow">
@@ -30,4 +31,4 @@ Hooks.once("ready", () => {
 	)
 
 	$("button[data-action=openReputation]").on("click", () => rep.render(true))
-});
+})
