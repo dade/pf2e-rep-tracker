@@ -125,24 +125,31 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 			})
 		})
 
+		// NOTE:
+		// Tabs appear to work without the need of explicitly creating a
+		// custom listener now. As if fixed overnight... I don't remember
+		// what I did to make this happen. Going to leave this code
+		// commented here just in case it's a blip
+		//
 		// # Tab Management
-		let tabBtn = thisEl.querySelectorAll("a[data-action=tab]")
-		tabBtn.forEach(btn => {
-			btn.addEventListener("click", async (event) => {
-				const tab = event.currentTarget.dataset.tab
+		//let tabBtn = thisEl.querySelectorAll("a[data-action=tab]")
+		//tabBtn.forEach(btn => {
+		//	btn.addEventListener("click", async (event) => {
+		//		const tab = event.currentTarget.dataset.tab
+		//
+		//		$(this.parts[tab]).addClass("active")
+		//
+		//		if (tab === "npc") {
+		//			$(this.parts.faction).removeClass("active")
+		//		} else {
+		//			$(this.parts.npc).removeClass("active")
+		//		}
+		//
+		//		this.changeTab(tab, "reputation")
+		//	})
+		//})
 
-				$(this.parts[tab]).addClass("active")
-
-				if (tab === "npc") {
-					$(this.parts.faction).removeClass("active")
-				} else {
-					$(this.parts.npc).removeClass("active")
-				}
-
-				this.changeTab(tab, "reputation")
-			})
-		})
-
+		// Input field onChange
 		let inputFields = thisEl.querySelectorAll("input")
 		inputFields.forEach(f => {
 			f.addEventListener("change", async (event) => {
@@ -150,10 +157,10 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 			})
 		})
 
+		// Edit reputation
 		let editCog = thisEl.querySelectorAll(".rep-controls .edit")
 		editCog.forEach(btn => {
 			btn.addEventListener("click", async (event) => {
-				// NOTE: Dialog...?
 				const et = event.currentTarget.closest(".party-rep")
 				const id = et.dataset.id
 				const type = $(et).hasClass("faction") ? "faction" : "npc"
@@ -218,8 +225,10 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 	}
 
 	static async addReputation() {
-		// NOTE: create a modal to input faction data
-		// on accept, push data into the "create" script
+		// TODO:
+		// - Find a way to get the tab we're on and if it is not
+		// the same as the entry we're creating, switch to the relevant
+		// tab?? Maybe
 		const fields = foundry.applications.fields;
 
 		const repType = fields.createSelectInput({
@@ -233,7 +242,8 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 					value: "npc"
 				}
 			],
-			name: "repType"
+			name: "repType",
+			autofocus: true
 		})
 
 		const repName = fields.createTextInput({
@@ -256,11 +266,12 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		const content = `${repTypeGroup.outerHTML} ${repNameGroup.outerHTML}`
 
 		new DialogV2({
-			window: { title: "Create New Faction" },
+			window: { title: "Create Reputation Entry" },
 			content: content,
 			buttons: [{
 				label: "Create",
 				default: true,
+				autofocus: false,
 				callback: (event, button, dialog) => {
 					return {
 						type: button.form.elements.repType.value,
@@ -273,10 +284,11 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 					return
 
 				await ReputationSystem.addReputation(result.type, result.name).then(() => {
-					this.render(true)
+					this.tabGroups.reputation = result.type
+					this.render(true, { focus: true })
 				})
 			}
-		}).render({ force: true })
+		}).render(true)
 	}
 
 	static async editReputation(id, type, app) {
@@ -312,8 +324,6 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 			content += `${influenceGroup.outerHTML}`
 		}
 
-		console.log(useInfluence.checked)
-
 		new DialogV2({
 			window: { title: "Edit Reputation: " + entry.name},
 			position: {
@@ -346,23 +356,34 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 				await game.actors.party.setFlag(MODULE, "reputation", flags).then(() => {
 					app.render(true)
-					console.log(game.actors.party.getFlag(MODULE, "reputation"))
 				})
 			}
-		}).render(true)
+		}).render(true, { focus: true })
 	}
 
 	static async reputationReset() {
-		// NOTE: remove all the data, and then repopulate it
-		await ReputationSystem.repopulateData(
-			game.actors.party,
-			REPUTATION,
-			true
-		).then(() => {
-			setTimeout(async () => {
-				await this.render(true)
-			}, 500)
+		const reset = await DialogV2.confirm({
+			id: "reset-reputation-confirm",
+			modal: true,
+			window: {
+				title: "CAUTION!!"
+			},
+			content: `<p>You are about to reset all reputation data. Are you sure?</p>`
 		})
+
+		if (!reset)
+			return
+		else {
+			await ReputationSystem.repopulateData(
+				game.actors.party,
+				REPUTATION,
+				true
+			).then(() => {
+				setTimeout(async () => {
+					await this.render(true)
+				}, 500)
+			})
+		}
 	}
 
 }

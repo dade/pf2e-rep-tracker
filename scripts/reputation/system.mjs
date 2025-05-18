@@ -56,8 +56,6 @@ export class ReputationSystem {
 		if (type === "npc")
 			repStruct.useInfluence = false
 
-		console.log(repStruct)
-
 		flags[type + "s"].push(repStruct)
 		party.setFlag(MODULE, "reputation", flags)
 	}
