@@ -10,7 +10,6 @@ export class ReputationSystem {
 		// Do we need to fix lib-wrapper patchFunc? Maybe not.
 
 		initHandlebarsHelpers()
-		this.initKeybinds()
 	}
 
 	static async buildData(party, schema) {
