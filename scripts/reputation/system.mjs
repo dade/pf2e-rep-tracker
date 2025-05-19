@@ -1,4 +1,5 @@
 import { initHandlebarsHelpers } from "../helpers/handlebars.mjs"
+import { Settings } from "../helpers/settings.mjs"
 
 const MODULE = "pf2e-rep-tracker"
 
@@ -7,32 +8,20 @@ export class ReputationSystem {
 	static app = null
 
 	static async init() {
-		// Do we need to fix lib-wrapper patchFunc? Maybe not.
-
 		initHandlebarsHelpers()
 	}
 
-	static async buildData(party, schema) {
-		await party.setFlag(MODULE, "reputation", schema)
-	}
-
-	static async repopulateData(party, schema, rebuildData = false) {
-		let data = await party.getFlag(MODULE, "reputation")
-
-		if (rebuildData) {
-			await party.setFlag(MODULE, "reputation", null)
-			await party.setFlag(MODULE, "reputation", schema)
-		}
-
-		if (!data)
-			await party.setFlag(MODULE, "reputation", schema)
+	static async resetDB() {
+		Settings.set(Settings.KEYS.REP_DB, {
+			factions: [],
+			npcs: []
+		})
 	}
 
 	static async addReputation(type, name) {
-		const party = game.actors.party
-		const flags = party.getFlag(MODULE, "reputation")
+		const db = Settings.get(Settings.KEYS.REP_DB)
 		const uuid = foundry.utils.randomID(5)
-		const members = party.members
+		const members = game.actors.party.members
 		let pcs = []
 
 		for (let m of members) {
@@ -56,37 +45,13 @@ export class ReputationSystem {
 		if (type === "npc")
 			repStruct.useInfluence = false
 
-		console.log(repStruct)
-
-		flags[type + "s"].push(repStruct)
-		party.setFlag(MODULE, "reputation", flags)
+		db[type + "s"].push(repStruct)
+		Settings.set(Settings.KEYS.REP_DB, db)
 	}
-
+	
 	static async expandReputation(event) {
 		const target = event.currentTarget
-		const party = game.actors.party
-		const flags = party.getFlag(MODULE, "reputation")
-		const partyRep = target.closest(".party-rep")
-		let repType
-		let entry
-
-		if ($(partyRep).hasClass("faction"))
-			repType = "factions"
-		if ($(partyRep).hasClass("npc"))
-			repType = "npcs"
-
-		entry = flags[repType].find(rep => rep.id === partyRep.dataset.id)
-
-		if(entry)
-			entry.expanded = !entry.expanded
-
-		await party.setFlag(MODULE, "reputation", flags)
-	}
-
-	static async deleteReputation(event) {
-		const target = event.currentTarget
-		const party = game.actors.party
-		const flags = party.getFlag(MODULE, "reputation")
+		const db = Settings.get(Settings.KEYS.REP_DB)
 		const partyRep = target.closest(".party-rep")
 		let repType
 		let entry
@@ -96,14 +61,28 @@ export class ReputationSystem {
 		else if ($(partyRep).hasClass("npc"))
 			repType = "npcs"
 
-		entry = flags[repType].find(rep => rep.id === partyRep.dataset.id)
+		entry = db[repType].find(rep => rep.id === partyRep.dataset.id)
+		if (entry)
+			entry.expanded = !entry.expanded
 
-		if (entry) {
-			const flagIndex = flags[repType].indexOf(entry)
-			flags[repType].splice(flagIndex, 1)
-		}
+		Settings.set(Settings.KEYS.REP_DB, db)
+	}
 
-		await party.setFlag(MODULE, "reputation", flags)
+	static async deleteReputation(event) {
+		const target = event.currentTarget
+		const db = Settings.get(Settings.KEYS.REP_DB)
+		const partyRep = target.closest(".party-rep")
+		let repType
+		let entry
+
+		if ($(partyRep).hasClass("faction"))
+			repType = "factions"
+		else if ($(partyRep).hasClass("npc"))
+			repType = "npcs"
+
+		entry = db[repType].find(rep => rep.id === partyRep.dataset.id)
+
+		Settings.set(Settings.KEYS.REP_DB, db)
 	}
 
 }

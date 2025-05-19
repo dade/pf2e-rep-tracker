@@ -1,6 +1,6 @@
-const { ApplicationV2, HandlebarsApplicationMixin, DialogV2, DocumentreputationV2 } = foundry.applications.api
-import { REPUTATION_SCHEMA as REPUTATION } from "../consts.mjs"
+const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api
 import { ReputationSystem } from "../reputation/system.mjs"
+import { Settings } from "../helpers/settings.mjs"
 
 const MODULE = "pf2e-rep-tracker"
 
@@ -14,8 +14,9 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		},
 		actions: {
 			addReputation: PF2eReputation.addReputation,
-			reputationReset: PF2eReputation.reputationReset,
-			editReputation: PF2eReputation.editReputation
+			editReputation: PF2eReputation.editReputation,
+			resetDB: PF2eReputation.resetDB,
+			openTracker: PF2eReputation.openTracker
 		},
 		window: {
 			icon: "fas fa-flag",
@@ -30,7 +31,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 				{
 					icon: "fas fa-trash",
 					label: "Reset All Data",
-					action: "reputationReset"
+					action: "resetDB"
 				}
 			]
 		},
@@ -71,7 +72,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 	async _prepareContext(options) {
 		let context = await super._prepareContext(options)
-		context.party = game.actors.party.getFlag(MODULE, "reputation")
+		context.party = Settings.get(Settings.KEYS.REP_DB)
 
 		context.tabs = {
 			faction: {
@@ -126,6 +127,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		})
 
 		// # Tab Management
+		// TODO: Fix this to be dynamic... yikes
 		let tabBtn = thisEl.querySelectorAll("a[data-action=tab]")
 		tabBtn.forEach(btn => {
 			btn.addEventListener("click", async (event) => {
@@ -181,8 +183,8 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		if (rep.field === rep)
 			rep.value = int(rep.value)
 
-		const flags = await game.actors.party.getFlag(MODULE, "reputation")
-		const entry = flags[rep.type].find(r => r.id === rep.id)
+		const db = Settings.get(Settings.KEYS.REP_DB)
+		const entry = db[rep.type].find(r => r.id === rep.id)
 
 		if (!entry)
 			return
@@ -197,9 +199,8 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 			entry.name = rep.value
 		}
 
-		await game.actors.party.setFlag(MODULE, "reputation", flags).then(async () => {
-			this.render(true)
-		})
+		Settings.set(Settings.KEYS.REP_DB, db)
+		this.render(true, { focus: true })
 	}
 
 	changeTab(tab, group, options = {}) {
@@ -280,9 +281,9 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 	}
 
 	static async editReputation(id, type, app) {
-		const flags = await game.actors.party.getFlag(MODULE, "reputation")
-		const fields = foundry.applications.fields;
-		const entry = flags[type + "s"].find(a => a.id === id)
+		const db = Settings.get(Settings.KEYS.REP_DB)
+		const fields = foundry.applications.fields
+		const entry = db[type + "s"].find(r => r.id === id)
 		type = type + "s"
 
 		const showpcs = fields.createCheckboxInput({
@@ -338,31 +339,36 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 				}
 			}],
 			submit: async (res) => {
-				const flags = await game.actors.party.getFlag(MODULE, "reputation")
-				const entry = flags[type].find(r => r.id === id)
+				const db = Settings.get(Settings.KEYS.REP_DB)
+				const entry = db[type].find(r => r.id === id)
 
 				entry.showpcs = res.showpcs
 				entry.useInfluence = res.useInfluence
 
-				await game.actors.party.setFlag(MODULE, "reputation", flags).then(() => {
-					app.render(true)
-					console.log(game.actors.party.getFlag(MODULE, "reputation"))
-				})
+				Settings.set(Settings.KEYS.REP_DB, db)
+				app.render(true, { focus: true })
 			}
 		}).render(true)
 	}
 
-	static async reputationReset() {
-		// NOTE: remove all the data, and then repopulate it
-		await ReputationSystem.repopulateData(
-			game.actors.party,
-			REPUTATION,
-			true
-		).then(() => {
-			setTimeout(async () => {
-				await this.render(true)
-			}, 500)
+	static async resetDB() {
+		const reset = await DialogV2.confirm({
+			id: "reset-reputation-confirm",
+			modal: true,
+			window: {
+				title: "CAUTION!"
+			},
+			content: `<p align="center">You are about to delete and reset all reputation data.<br/>Are you sure?`
 		})
+
+		if (!reset)
+			return
+		else
+			await ReputationSystem.resetDB().then(() => {
+				setTimeout(async () => {
+					this.render(true, { focus: true })
+				}, 500)
+			})
 	}
 
 }

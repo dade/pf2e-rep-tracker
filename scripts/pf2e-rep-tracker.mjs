@@ -1,21 +1,28 @@
 import { default as PF2eReputation } from "./application/rep-tracker.mjs"
 import { ReputationSystem } from "./reputation/system.mjs"
+import { Settings } from "./helpers/settings.mjs"
 import { REPUTATION_SCHEMA } from "./consts.mjs"
 
 const MODULE = "pf2e-rep-tracker";
 
 Hooks.once("init", async () => {
 	ReputationSystem.init()
+	Settings.registerSettings()
+
+	// TODO: Work out how to properyly handle toggling the window.
+	// Low prior
+	//
+	//game.keybindings.register(MODULE, "openRep", {
+	//	name: "Open Reputation Tracker",
+	//	editable: [
+	//		{ key: "KeyO" }
+	//	],
+	//	onDown: ???
+	//})
 })
 
 Hooks.once("ready", () => {
 	console.log("Reputation Tracker | READY")
-	const party = game.actors.party
-	const repFlags = party.getFlag(MODULE, "reputation")
-
-	if (!repFlags) {
-		ReputationSystem.buildData(game.actors.party, REPUTATION_SCHEMA)
-	}
 });
 
 Hooks.on("ready", () => {
