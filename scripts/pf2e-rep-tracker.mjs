@@ -8,17 +8,6 @@ const MODULE = "pf2e-rep-tracker";
 Hooks.once("init", async () => {
 	ReputationSystem.init()
 	Settings.registerSettings()
-
-	// TODO: Work out how to properyly handle toggling the window.
-	// Low prior
-	//
-	//game.keybindings.register(MODULE, "openRep", {
-	//	name: "Open Reputation Tracker",
-	//	editable: [
-	//		{ key: "KeyO" }
-	//	],
-	//	onDown: ???
-	//})
 })
 
 Hooks.once("ready", () => {

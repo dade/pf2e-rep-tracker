@@ -15,8 +15,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		actions: {
 			addReputation: PF2eReputation.addReputation,
 			editReputation: PF2eReputation.editReputation,
-			resetDB: PF2eReputation.resetDB,
-			openTracker: PF2eReputation.openTracker
+			resetDB: PF2eReputation.resetDB
 		},
 		window: {
 			icon: "fas fa-flag",
@@ -349,6 +348,10 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 				app.render(true, { focus: true })
 			}
 		}).render(true)
+	}
+
+	async close(options = {}) {
+		super.close(options)
 	}
 
 	static async resetDB() {
