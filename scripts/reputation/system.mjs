@@ -50,9 +50,8 @@ export class ReputationSystem {
 	}
 	
 	static async expandReputation(event) {
-		const target = event.currentTarget
+		const partyRep = event.currentTarget.closest(".party-rep")
 		const db = Settings.get(Settings.KEYS.REP_DB)
-		const partyRep = target.closest(".party-rep")
 		let repType
 		let entry
 
@@ -68,10 +67,8 @@ export class ReputationSystem {
 		Settings.set(Settings.KEYS.REP_DB, db)
 	}
 
-	static async deleteReputation(event) {
-		const target = event.currentTarget
+	static async deleteReputation(partyRep) {
 		const db = Settings.get(Settings.KEYS.REP_DB)
-		const partyRep = target.closest(".party-rep")
 		let repType
 		let entry
 

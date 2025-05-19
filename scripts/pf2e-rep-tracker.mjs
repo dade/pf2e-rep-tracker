@@ -3,7 +3,7 @@ import { ReputationSystem } from "./reputation/system.mjs"
 import { Settings } from "./helpers/settings.mjs"
 import { REPUTATION_SCHEMA } from "./consts.mjs"
 
-const MODULE = "pf2e-rep-tracker";
+const MODULE = "pf2e-rep-tracker"
 
 // TODO:
 // - Transition storage of Reputation data to game.settings rather than party flags
@@ -18,21 +18,21 @@ Hooks.once("init", async () => {
 
 Hooks.once("ready", () => {
 	console.log("Reputation Tracker | READY")
-});
+})
 
 Hooks.on("ready", () => {
 	const rep = new PF2eReputation()
-	
-	if (!game.user.isGM && !Settings.get(Settings.KEYS.VIS_PLAYER))
+
+	if (!game.user.isGM)
 		return
 
 	$(".actors-sidebar .directory-header .header-actions").after(
 		`<div class="header-actions action-buttons flexrow">
-	       <button type="button" class="button" data-action="openReputation">
-	           <i class="fa-solid fa-flag"></i>
-	           <span>Open Reputation</span>
-	       </button>
-	   </div>`
+			<button type="button" class="button" data-action="openReputation">
+				 <i class="fa-solid fa-flag"></i>
+				 <span>Open Reputation</span>
+			</button>
+		</div>`
 	)
 
 	$("button[data-action=openReputation]").on("click", () => rep.render(true))

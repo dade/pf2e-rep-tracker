@@ -1,9 +1,6 @@
-const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } =
-	foundry.applications.api
+const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api
 import { ReputationSystem } from "../reputation/system.mjs"
 import { Settings } from "../helpers/settings.mjs"
-
-const MODULE = "pf2e-rep-tracker"
 
 export default class PF2eReputation extends HandlebarsApplicationMixin(
 	ApplicationV2
@@ -125,8 +122,12 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(
 				const db = Settings.get(Settings.KEYS.REP_DB)
 				const id = rep.dataset.id
 				let repType
-				if ($(rep).hasClass("faction")) repType = "factions"
-				else if ($(rep).hasClass("npc")) repType = "npcs"
+
+				if ($(rep).hasClass("faction"))
+					repType = "factions"
+				else if ($(rep).hasClass("npc"))
+					repType = "npcs"
+				
 				const entry = db[repType].find((rep) => rep.id === id)
 
 				const deleteEntry = await DialogV2.confirm({
@@ -139,7 +140,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(
 				})
 
 				if (deleteEntry)
-					await ReputationSystem.deleteReputation(event).then(() => {
+					await ReputationSystem.deleteReputation(rep).then(() => {
 						this.render(true)
 					})
 			})
@@ -181,7 +182,8 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(
 			value: target.value
 		}
 
-		if (rep.field === rep) rep.value = int(rep.value)
+		if (rep.field === rep)
+			rep.value = int(rep.value)
 
 		const db = Settings.get(Settings.KEYS.REP_DB)
 		const entry = db[rep.type].find((r) => r.id === rep.id)
@@ -194,9 +196,8 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(
 			} else {
 				entry.value = rep.value
 			}
-		} else if (rep.field === "name") {
+		} else if (rep.field === "name")
 			entry.name = rep.value
-		}
 
 		Settings.set(Settings.KEYS.REP_DB, db)
 		this.render(true, { focus: true })
@@ -271,7 +272,8 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(
 				}
 			],
 			submit: async (result) => {
-				if (!result) return
+				if (!result)
+					return
 
 				await ReputationSystem.addReputation(result.type, result.name).then(
 					() => {
@@ -371,7 +373,8 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(
 			content: `<p align="center">You are about to delete and reset all reputation data.<br/>Are you sure?`
 		})
 
-		if (!reset) return
+		if (!reset)
+			return
 		else
 			await ReputationSystem.resetDB().then(() => {
 				setTimeout(async () => {
