@@ -22,6 +22,9 @@ Hooks.once("ready", () => {
 
 Hooks.on("ready", () => {
 	const rep = new PF2eReputation()
+	
+	if (!game.user.isGM && !Settings.get(Settings.KEYS.VIS_PLAYER))
+		return
 
 	$(".actors-sidebar .directory-header .header-actions").after(
 		`<div class="header-actions action-buttons flexrow">

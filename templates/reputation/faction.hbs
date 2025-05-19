@@ -6,26 +6,38 @@
 	{{#each party.factions as |faction|}}
 	<section class="rep-entry">
 		<section class="party-rep faction" data-id="{{faction.id}}">
+			{{#if ../isGM}}
 			<div class="rep-expand">
 				<a class="expand">
 					<i class="fa-solid fa-caret-{{#if faction.expanded}}down{{else}}right{{/if}}"></i>
 				</a>
 			</div>
+			{{/if}}
 			<div class="rep-details">
 				<div class="form-group">
+					{{#if ../isGM}}
 					<input data-field-id="faction-{{faction.id}}-party-name" class="group-name" name="rep-name" type="text" value="{{faction.name}}" />
+					{{else}}
+					<h3>{{faction.name}}</h3>
+					{{/if}}
 				</div>
 				<span class="party-value">
 					<strong>Party Reputation:</strong>&nbsp;
+					{{#if ../isGM}}
 					<input data-field-id="faction-{{faction.id}}-party-rep" class="number-input" type="number" value="{{faction.value}}" />&nbsp;
-					<p><small><em>{{getRepText faction.value false}}</em></small></p>
+					{{else}}
+					{{/if}}
+					<p><small><em>{{faction.value}} {{getRepText faction.value false}}</em></small></p>
 				</span>
 			</div>
+			{{#if ../isGM}}
 			<div class="rep-controls">
 				<a class="edit"><i class="fas fa-cog"></i></a>
 				<a class="delete"><i class="fas fa-trash"></i></a>
 			</div>
+			{{/if}}
 		</section>
+		{{#if ../isGM}}
 		{{#if faction.showpcs}}
 		<section class="member-rep expanded-{{faction.expanded}}">
 			{{#each faction.pcs as |pc|}}
@@ -42,6 +54,19 @@
 		{{else}}
 		<section class="member-rep expanded-{{faction.expanded}}">
 			<p>Individual PC rep as been disabled for this reputation. You can edit its settings by clicking the <i class="fas fa-cog"></i> on the right</p>
+		</section>
+		{{/if}}
+		{{else}}
+		<section class="member-rep expanded-true">
+			{{#each faction.pcs as |pc|}}
+			<div class="member-row">
+				<img src="{{getImgFromUUID pc.uuid}}" />
+				<p class="member-name">
+					{{pc.name}}
+					<span><small><em>{{pc.value}} {{getRepText pc.value false}}</em></small></span>
+				</p>
+			</div>
+			{{/each}}
 		</section>
 		{{/if}}
 	</section>

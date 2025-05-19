@@ -16,6 +16,7 @@ export class Settings {
 			scope: "world",
 			type: Boolean,
 			default: false,
+			requiresReload: true,
 			config: true
 		})
 

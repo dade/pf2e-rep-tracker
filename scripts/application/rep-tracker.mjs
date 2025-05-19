@@ -72,6 +72,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 	async _prepareContext(options) {
 		let context = await super._prepareContext(options)
 		context.party = Settings.get(Settings.KEYS.REP_DB)
+		context.isGM = game.user.isGM
 
 		context.tabs = {
 			faction: {
@@ -119,35 +120,31 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		let deleteBtn = thisEl.querySelectorAll(".rep-controls .delete")
 		deleteBtn.forEach(btn => {
 			btn.addEventListener("click", async (event) => {
-				await ReputationSystem.deleteReputation(event).then(() => {
-					this.render(true)
+				const rep = event.currentTarget.closest(".party-rep")
+				const db = Settings.get(Settings.KEYS.REP_DB)
+				const id = rep.dataset.id
+				let repType
+				if ($(rep).hasClass("faction"))
+					repType = "factions"
+				else if ($(rep).hasClass("npc"))
+					repType = "npcs"
+				const entry = db[repType].find(rep => rep.id === id)
+
+				const deleteEntry = await DialogV2.confirm({
+					id: "delete-entry-confirm",
+					modal: true,
+					window: {
+						title: "CAUTION!"
+					},
+					content: `<p>You are about to delete "${entry.name}" reputation data.<br/><strong>Are you sure?</strong></p>`
 				})
+
+				if (deleteEntry)
+					await ReputationSystem.deleteReputation(event).then(() => {
+						this.render(true)
+					})
 			})
 		})
-
-		// NOTE:
-		// Tabs appear to work without the need of explicitly creating a
-		// custom listener now. As if fixed overnight... I don't remember
-		// what I did to make this happen. Going to leave this code
-		// commented here just in case it's a blip
-		//
-		// # Tab Management
-		//let tabBtn = thisEl.querySelectorAll("a[data-action=tab]")
-		//tabBtn.forEach(btn => {
-		//	btn.addEventListener("click", async (event) => {
-		//		const tab = event.currentTarget.dataset.tab
-		//
-		//		$(this.parts[tab]).addClass("active")
-		//
-		//		if (tab === "npc") {
-		//			$(this.parts.faction).removeClass("active")
-		//		} else {
-		//			$(this.parts.npc).removeClass("active")
-		//		}
-		//
-		//		this.changeTab(tab, "reputation")
-		//	})
-		//})
 
 		// Input field onChange
 		let inputFields = thisEl.querySelectorAll("input")
@@ -224,10 +221,6 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 	}
 
 	static async addReputation() {
-		// TODO:
-		// - Find a way to get the tab we're on and if it is not
-		// the same as the entry we're creating, switch to the relevant
-		// tab?? Maybe
 		const fields = foundry.applications.fields;
 
 		const repType = fields.createSelectInput({
