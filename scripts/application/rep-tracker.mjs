@@ -1,11 +1,13 @@
-const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api
+const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } =
+	foundry.applications.api
 import { ReputationSystem } from "../reputation/system.mjs"
 import { Settings } from "../helpers/settings.mjs"
 
 const MODULE = "pf2e-rep-tracker"
 
-export default class PF2eReputation extends HandlebarsApplicationMixin(ApplicationV2) {
-
+export default class PF2eReputation extends HandlebarsApplicationMixin(
+	ApplicationV2
+) {
 	static DEFAULT_OPTIONS = {
 		classes: ["rep-tracker"],
 		position: {
@@ -58,7 +60,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		reputation: {
 			tabs: [
 				{ id: "faction", icon: "fas fa-people", label: "Faction" },
-				{ id: "npc", icon: "fas fa-person", label: "NPC" },
+				{ id: "npc", icon: "fas fa-person", label: "NPC" }
 			],
 			initial: "faction"
 		}
@@ -72,7 +74,6 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 	async _prepareContext(options) {
 		let context = await super._prepareContext(options)
 		context.party = Settings.get(Settings.KEYS.REP_DB)
-		context.isGM = game.user.isGM
 
 		context.tabs = {
 			faction: {
@@ -108,7 +109,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 		// # Expand/Collapse
 		let expandBtn = thisEl.querySelectorAll("a.expand")
-		expandBtn.forEach(btn => {
+		expandBtn.forEach((btn) => {
 			btn.addEventListener("click", async (event) => {
 				await ReputationSystem.expandReputation(event).then(() => {
 					this.render(true)
@@ -118,17 +119,15 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 		// # Delete Entry
 		let deleteBtn = thisEl.querySelectorAll(".rep-controls .delete")
-		deleteBtn.forEach(btn => {
+		deleteBtn.forEach((btn) => {
 			btn.addEventListener("click", async (event) => {
 				const rep = event.currentTarget.closest(".party-rep")
 				const db = Settings.get(Settings.KEYS.REP_DB)
 				const id = rep.dataset.id
 				let repType
-				if ($(rep).hasClass("faction"))
-					repType = "factions"
-				else if ($(rep).hasClass("npc"))
-					repType = "npcs"
-				const entry = db[repType].find(rep => rep.id === id)
+				if ($(rep).hasClass("faction")) repType = "factions"
+				else if ($(rep).hasClass("npc")) repType = "npcs"
+				const entry = db[repType].find((rep) => rep.id === id)
 
 				const deleteEntry = await DialogV2.confirm({
 					id: "delete-entry-confirm",
@@ -148,7 +147,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 		// Input field onChange
 		let inputFields = thisEl.querySelectorAll("input")
-		inputFields.forEach(f => {
+		inputFields.forEach((f) => {
 			f.addEventListener("change", async (event) => {
 				await this._onChangeInput(event)
 			})
@@ -156,7 +155,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 		// Edit reputation
 		let editCog = thisEl.querySelectorAll(".rep-controls .edit")
-		editCog.forEach(btn => {
+		editCog.forEach((btn) => {
 			btn.addEventListener("click", async (event) => {
 				const et = event.currentTarget.closest(".party-rep")
 				const id = et.dataset.id
@@ -169,7 +168,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 	async _onChangeInput(event) {
 		const target = event.currentTarget
-		
+
 		// INFO: using data-field-id, we assign each input with an id that lets us figure out its
 		// origin and target, so we know exactly where we need to update the data.
 		// this is achieved by getting `event.currentTarget.dataset.fieldId`
@@ -182,18 +181,16 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 			value: target.value
 		}
 
-		if (rep.field === rep)
-			rep.value = int(rep.value)
+		if (rep.field === rep) rep.value = int(rep.value)
 
 		const db = Settings.get(Settings.KEYS.REP_DB)
-		const entry = db[rep.type].find(r => r.id === rep.id)
+		const entry = db[rep.type].find((r) => r.id === rep.id)
 
-		if (!entry)
-			return
+		if (!entry) return
 
 		if (rep.field === "rep") {
 			if (rep.actor.includes("Actor")) {
-				entry.pcs.find(a => a.uuid === rep.actor).value = rep.value
+				entry.pcs.find((a) => a.uuid === rep.actor).value = rep.value
 			} else {
 				entry.value = rep.value
 			}
@@ -221,7 +218,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 	}
 
 	static async addReputation() {
-		const fields = foundry.applications.fields;
+		const fields = foundry.applications.fields
 
 		const repType = fields.createSelectInput({
 			options: [
@@ -240,7 +237,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 		const repName = fields.createTextInput({
 			name: "repName",
-			value: `Name`,
+			value: `Name`
 		})
 
 		const repTypeGroup = fields.createFormGroup({
@@ -260,25 +257,28 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		new DialogV2({
 			window: { title: "Create Reputation Entry" },
 			content: content,
-			buttons: [{
-				label: "Create",
-				default: true,
-				autofocus: false,
-				callback: (event, button, dialog) => {
-					return {
-						type: button.form.elements.repType.value,
-						name: button.form.elements.repName.value
+			buttons: [
+				{
+					label: "Create",
+					default: true,
+					autofocus: false,
+					callback: (event, button, dialog) => {
+						return {
+							type: button.form.elements.repType.value,
+							name: button.form.elements.repName.value
+						}
 					}
 				}
-			}],
+			],
 			submit: async (result) => {
-				if (!result)
-					return
+				if (!result) return
 
-				await ReputationSystem.addReputation(result.type, result.name).then(() => {
-					this.tabGroups.reputation = result.type
-					this.render(true, { focus: true })
-				})
+				await ReputationSystem.addReputation(result.type, result.name).then(
+					() => {
+						this.tabGroups.reputation = result.type
+						this.render(true, { focus: true })
+					}
+				)
 			}
 		}).render(true)
 	}
@@ -286,17 +286,17 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 	static async editReputation(id, type, app) {
 		const db = Settings.get(Settings.KEYS.REP_DB)
 		const fields = foundry.applications.fields
-		const entry = db[type + "s"].find(r => r.id === id)
+		const entry = db[type + "s"].find((r) => r.id === id)
 		type = type + "s"
 
 		const showpcs = fields.createCheckboxInput({
 			value: entry.showpcs,
-			name: "showpcs",
+			name: "showpcs"
 		})
 
 		const useInfluence = fields.createCheckboxInput({
 			value: entry.useInfluence,
-			name: "useInfluence",
+			name: "useInfluence"
 		})
 
 		const showpcsGroup = fields.createFormGroup({
@@ -322,7 +322,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 		}
 
 		new DialogV2({
-			window: { title: "Edit Reputation: " + entry.name},
+			window: { title: "Edit Reputation: " + entry.name },
 			position: {
 				width: 500
 			},
@@ -331,27 +331,27 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 				submitOnChange: false
 			},
 			content,
-			buttons: [{
-				label: "Save",
-				callback: (event, button, dialog) => {
-					let res = {
-						showpcs: button.form.elements.showpcs.checked
+			buttons: [
+				{
+					label: "Save",
+					callback: (event, button, dialog) => {
+						let res = {
+							showpcs: button.form.elements.showpcs.checked
+						}
+
+						if (button.form.elements.useInfluence)
+							res.useInfluence = button.form.elements.useInfluence.checked
+
+						return res
 					}
-
-					if (button.form.elements.useInfluence)
-						res.useInfluence = button.form.elements.useInfluence.checked
-
-					return res
 				}
-			}],
+			],
 			submit: async (res) => {
 				const db = Settings.get(Settings.KEYS.REP_DB)
-				const entry = db[type].find(r => r.id === id)
+				const entry = db[type].find((r) => r.id === id)
 
-				if (res.useInfluence === true)
-					entry.shownpcs = true
-				else
-					entry.showpcs = res.showpcs
+				if (res.useInfluence === true) entry.shownpcs = true
+				else entry.showpcs = res.showpcs
 
 				entry.useInfluence = res.useInfluence
 
@@ -371,8 +371,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 			content: `<p align="center">You are about to delete and reset all reputation data.<br/>Are you sure?`
 		})
 
-		if (!reset)
-			return
+		if (!reset) return
 		else
 			await ReputationSystem.resetDB().then(() => {
 				setTimeout(async () => {
@@ -380,5 +379,4 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 				}, 500)
 			})
 	}
-
 }
