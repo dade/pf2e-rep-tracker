@@ -82,6 +82,11 @@ export class ReputationSystem {
 
 		entry = db[repType].find(rep => rep.id === partyRep.dataset.id)
 
+		if (entry) {
+			const dbIndex = db[repType].indexOf(entry)
+			db[repType].splice(dbIndex, 1)
+		}
+
 		Settings.set(Settings.KEYS.REP_DB, db)
 	}
 
