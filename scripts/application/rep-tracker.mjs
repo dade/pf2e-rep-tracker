@@ -233,12 +233,13 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 					value: "npc"
 				}
 			],
-			name: "repType"
+			name: "repType",
+			autofocus: true
 		})
 
 		const repName = fields.createTextInput({
 			name: "repName",
-			value: `Name`
+			value: `Name`,
 		})
 
 		const repTypeGroup = fields.createFormGroup({
@@ -287,12 +288,12 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 
 		const showpcs = fields.createCheckboxInput({
 			value: entry.showpcs,
-			name: "showpcs"
+			name: "showpcs",
 		})
 
 		const useInfluence = fields.createCheckboxInput({
 			value: entry.useInfluence,
-			name: "useInfluence"
+			name: "useInfluence",
 		})
 
 		const showpcsGroup = fields.createFormGroup({
@@ -307,12 +308,15 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 			hint: "Use the Influence system for PF2e rather than the Reputation system. Influence thresholds can be set up."
 		})
 
+		if (useInfluence.checked) {
+			showpcs.checked = true
+			showpcs.disabled = true
+		}
+
 		let content = `${showpcsGroup.outerHTML}`
 		if (type === "npcs") {
 			content += `${influenceGroup.outerHTML}`
 		}
-
-		console.log(useInfluence.checked)
 
 		new DialogV2({
 			window: { title: "Edit Reputation: " + entry.name},
@@ -341,7 +345,11 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(Applicati
 				const db = Settings.get(Settings.KEYS.REP_DB)
 				const entry = db[type].find(r => r.id === id)
 
-				entry.showpcs = res.showpcs
+				if (res.useInfluence === true)
+					entry.shownpcs = true
+				else
+					entry.showpcs = res.showpcs
+
 				entry.useInfluence = res.useInfluence
 
 				Settings.set(Settings.KEYS.REP_DB, db)
