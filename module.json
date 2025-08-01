@@ -22,8 +22,8 @@
         "id": "pf2e",
         "type": "system",
         "compatibility": {
-          "minimum": "7.0.6-beta",
-          "verified": "7.0.6-beta"
+          "minimum": "7.3.0",
+          "verified": "7.3.0"
         }
       }
     ]
