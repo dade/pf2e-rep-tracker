@@ -1,6 +1,7 @@
 @layer reputation {
   .rep-tracker section.window-content {
     margin: 0;
+    overflow-y: scroll;
   }
   .rep-tracker section.window-content .content {
     display: none;
