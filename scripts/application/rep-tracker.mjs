@@ -276,13 +276,14 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(
 					return
 
 				await ReputationSystem.addReputation(result.type, result.name).then(
-					() => {
+					setTimeout(async () => {
 						this.tabGroups.reputation = result.type
+						// this.close()
 						this.render(true, { focus: true })
-					}
+					}, 500)
 				)
 			}
-		}).render(true)
+		}).render(true, { focus: true })
 	}
 
 	static async editReputation(id, type, app) {

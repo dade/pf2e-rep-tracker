@@ -20,20 +20,41 @@ Hooks.once("ready", () => {
 	console.log("Reputation Tracker | READY")
 })
 
-Hooks.on("ready", () => {
-	const rep = new PF2eReputation()
-
+Hooks.on("ready", (html) => {
 	if (!game.user.isGM)
 		return
 
-	$(".actors-sidebar .directory-header .header-actions").after(
-		`<div class="header-actions action-buttons flexrow">
-			<button type="button" class="button" data-action="openReputation">
-				 <i class="fa-solid fa-flag"></i>
-				 <span>Open Reputation</span>
-			</button>
-		</div>`
-	)
+	// $(".actors-sidebar .directory-header .header-actions").after(
+	// 	`<div class="header-actions action-buttons flexrow">
+	// 		<button type="button" class="button" data-action="openReputation">
+	// 			 <i class="fa-solid fa-flag"></i>
+	// 			 <span>Open Reputation</span>
+	// 		</button>
+	// 	</div>`
+	// )
+})
 
-	$("button[data-action=openReputation]").on("click", () => rep.render(true))
+Hooks.on("renderSceneControls", (app, html, data) => {
+	if (!game.user.isGM)
+		return
+
+	if (html.querySelector(".open-rep-control"))
+		return
+
+	const rep = new PF2eReputation()
+
+	if (html.querySelector('button[data-action=openReputation]'))
+		return
+
+	const li = document.createElement("li")
+	const button = document.createElement("button")
+
+	button.className = "control ui-control layer icon fa-solid fa-flag open-rep-control"
+	button.dataset.tooltip = "Open Reputation Tracker"
+
+	li.appendChild(button)
+	html.querySelector('menu[id="scene-controls-layers"]').appendChild(li)
+	button.addEventListener("click", () => {
+		rep.render(true)
+	})
 })
