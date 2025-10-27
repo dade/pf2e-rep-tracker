@@ -24,14 +24,19 @@ Hooks.on("ready", (html) => {
 	if (!game.user.isGM)
 		return
 
-	// $(".actors-sidebar .directory-header .header-actions").after(
-	// 	`<div class="header-actions action-buttons flexrow">
-	// 		<button type="button" class="button" data-action="openReputation">
-	// 			 <i class="fa-solid fa-flag"></i>
-	// 			 <span>Open Reputation</span>
-	// 		</button>
-	// 	</div>`
-	// )
+	if (game.settings.get(MODULE, "adminDBResetControls"))
+		$(".actors-sidebar .directory-header .header-actions").after(
+			`<div class="header-actions action-buttons flexrow">
+				<button type="button" class="button" data-action="resetDB">
+					 <i class="fa-solid fa-cancel"></i>
+					 <span>Reset Rep DB</span>
+				</button>
+			</div>`
+		)
+
+	$("button[data-action=resetDB]").click((html, data, other) => {
+		ReputationSystem.resetDB()
+	})
 })
 
 Hooks.on("renderSceneControls", (app, html, data) => {

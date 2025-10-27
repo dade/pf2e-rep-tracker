@@ -17,6 +17,15 @@ export class Settings {
 				npcs: []
 			}
 		})
+		game.settings.register(MODULE, "adminDBResetControls", {
+			name: "Admin Reset DB Controls",
+			hint: "Turns on a button on the actor screen to kill the DB. This is a hacky way to reset the db in case the rep window doesn't load. Don't use.",
+			scope: "world",
+			type: Boolean,
+			config: true,
+			default: false,
+			reload: true
+		})
 	}
 
 	static get(name) {

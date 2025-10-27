@@ -379,7 +379,7 @@ export default class PF2eReputation extends HandlebarsApplicationMixin(
 		else
 			await ReputationSystem.resetDB().then(() => {
 				setTimeout(async () => {
-					this.render(true, { focus: true })
+					rep.render(true, { focus: true })
 				}, 500)
 			})
 	}
